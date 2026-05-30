@@ -15,6 +15,41 @@ function initAutocomplete() {
   });
 }
 
+// Provider selection initialization
+let selectedProvider = 'openai'; // Default provider
+
+async function initializeProviderSelector() {
+  try {
+    const response = await fetch("http://localhost:3000/providers");
+    const data = await response.json();
+
+    // Update available providers dropdown if it exists
+    const providerSelect = document.getElementById("provider-selection");
+    if (providerSelect) {
+      providerSelect.innerHTML = ''; // Clear existing options
+      data.configured.forEach(provider => {
+        const option = document.createElement('option');
+        option.value = provider;
+        option.textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
+        if (provider === data.default) {
+          option.selected = true;
+          selectedProvider = provider;
+        }
+        providerSelect.appendChild(option);
+      });
+
+      // Add event listener for provider changes
+      providerSelect.addEventListener('change', function() {
+        selectedProvider = this.value;
+        console.log(`[TERRA] Provider changed to: ${selectedProvider}`);
+      });
+    }
+  } catch (error) {
+    console.warn('[TERRA] Could not fetch available providers:', error);
+    selectedProvider = 'openai'; // Fallback
+  }
+}
+
 document.querySelectorAll(".custom-option").forEach((option) => {
   option.addEventListener("click", function () {
     if (!this.classList.contains("selected")) {
@@ -30,6 +65,8 @@ document.querySelectorAll(".custom-option").forEach((option) => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  initializeProviderSelector();
+
   const form = document.getElementById("address-form");
   const warningMessageDiv = document.getElementById("warningMessage");
 
@@ -92,7 +129,10 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt: prompt }),
+        body: JSON.stringify({
+          prompt: prompt,
+          provider: selectedProvider
+        }),
       });
 
       if (!response.ok) {

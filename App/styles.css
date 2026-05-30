@@ -132,6 +132,29 @@ body {
 
   #routeMessage{
     height: 32px;
-
   }
-  
+
+  /* Provider Selection Dropdown */
+  #provider-selection {
+    font-size: 14px;
+    color: #363636;
+    background-color: transparent;
+    border: 1px solid #363636;
+    -webkit-border-radius: 8;
+    -moz-border-radius: 8;
+    border-radius: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    width: 150px;
+    cursor: pointer;
+  }
+
+  #provider-selection:hover {
+    background-color: #f0f0f0;
+  }
+
+  #provider-selection:focus {
+    outline: none;
+    border-color: #363636;
+  }

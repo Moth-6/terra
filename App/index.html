@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Address Autocomplete Example</title>
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=YOUR_MAPS_KEY&libraries=places&callback=initAutocomplete"
-      async
-      defer
-    ></script>
+    <title>TERRA - AI Pocket Compass</title>
     <script src="script.js"></script>
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -21,12 +16,16 @@
       <div id="routeResult" style="display: none"></div>
 
       <form id="address-form" class="custom_input">
-        <input
-          id="autocomplete"
-          class="input"
-          placeholder="Location"
-          type="text"
-        />
+        <div class="autocomplete-wrapper">
+          <input
+            id="autocomplete"
+            class="input"
+            placeholder="Location"
+            type="text"
+            autocomplete="off"
+          />
+          <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+        </div>
         <select id="provider-selection"></select>
         <div class="custom-select">
           <select id="time-selection">

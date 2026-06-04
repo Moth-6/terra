@@ -1,16 +1,65 @@
 let selectedCoordinates = ""; // Global or higher scope variable to store coordinates
 
-function initAutocomplete() {
-  var input = document.getElementById("autocomplete");
-  var autocomplete = new google.maps.places.Autocomplete(input);
+function initOSMAutocomplete() {
+  const input = document.getElementById("autocomplete");
+  const dropdown = document.getElementById("autocomplete-dropdown");
+  let debounceTimer;
 
-  autocomplete.addListener("place_changed", function () {
-    var place = autocomplete.getPlace();
-    if (place.geometry) {
-      // Extract the latitude and longitude from the selected place
-      var lat = place.geometry.location.lat();
-      var lon = place.geometry.location.lng();
-      selectedCoordinates = `${lat},${lon}`; // Store the coordinates in a format suitable for your prompt
+  input.addEventListener("input", function () {
+    clearTimeout(debounceTimer);
+    const query = this.value.trim();
+
+    if (query.length < 3) {
+      dropdown.style.display = "none";
+      dropdown.innerHTML = "";
+      return;
+    }
+
+    debounceTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/geocode?q=${encodeURIComponent(query)}`
+        );
+        const results = await response.json();
+
+        dropdown.innerHTML = "";
+
+        if (!results.length) {
+          dropdown.style.display = "none";
+          return;
+        }
+
+        results.forEach((result) => {
+          const option = document.createElement("div");
+          option.className = "autocomplete-option";
+          option.textContent = result.display_name;
+          option.addEventListener("click", () => {
+            input.value = result.display_name;
+            selectedCoordinates = `${result.lat},${result.lon}`;
+            dropdown.style.display = "none";
+            dropdown.innerHTML = "";
+          });
+          dropdown.appendChild(option);
+        });
+
+        dropdown.style.display = "block";
+      } catch (error) {
+        console.warn("[TERRA] Geocoding failed:", error);
+      }
+    }, 300);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function (e) {
+    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  // Close dropdown on Escape key
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      dropdown.style.display = "none";
     }
   });
 }
@@ -65,6 +114,7 @@ document.querySelectorAll(".custom-option").forEach((option) => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  initOSMAutocomplete();
   initializeProviderSelector();
 
   const form = document.getElementById("address-form");

@@ -138,6 +138,46 @@ app.post('/generate-trail', async (req, res) => {
 });
 
 /**
+ * Geocode address using OpenStreetMap Nominatim (free, no API key required)
+ * GET /geocode?q=<address>
+ */
+app.get('/geocode', async (req, res) => {
+  const { q } = req.query;
+
+  if (!q || q.trim().length < 2) {
+    return res.json([]);
+  }
+
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q.trim())}&format=json&limit=5&addressdetails=1`;
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'TERRA-OpenSourceCompass/1.0',
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Nominatim error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const results = data.map(item => ({
+      display_name: item.display_name,
+      lat: parseFloat(item.lat),
+      lon: parseFloat(item.lon),
+    }));
+
+    res.json(results);
+  } catch (error) {
+    console.error(`[Geocode] ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * Test endpoint for specific provider
  * POST /test-provider
  * Body: { provider, prompt (optional) }

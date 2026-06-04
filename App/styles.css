@@ -158,3 +158,43 @@ body {
     outline: none;
     border-color: #363636;
   }
+
+/* OSM Autocomplete */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f8f7f4;
+  border: 1px solid #363636;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  width: 100%;
+  margin-top: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.autocomplete-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #363636;
+  border-bottom: 1px solid #e8e7e4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.autocomplete-option:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-option:hover {
+  background-color: #e8e7e4;
+}
